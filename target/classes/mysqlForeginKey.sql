@@ -1,0 +1,1 @@
+ select count(*) from information_schema.KEY_COLUMN_USAGE t WHERE t.CONSTRAINT_SCHEMA='nytm'
