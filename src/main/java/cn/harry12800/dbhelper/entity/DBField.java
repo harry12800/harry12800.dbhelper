@@ -278,7 +278,7 @@ public class  DBField implements Comparable<DBField> {
 		}else if("varchar".equalsIgnoreCase(type)){
 			return "VARCHAR2("+length+")";
 		}else if("long".equalsIgnoreCase(type)){
-			return "long";
+			return "LONG";
 		} else if("nvarchar2".equalsIgnoreCase(type)){
 			return "NVARCHAR2("+length+")";
 		}else if("TIMESTAMP(6)".equalsIgnoreCase(type)){
@@ -294,6 +294,10 @@ public class  DBField implements Comparable<DBField> {
 		}else if("tinyint".equalsIgnoreCase(type)){
 			return "NUMBER";
 		}else if("text".equalsIgnoreCase(type)){
+			return "VARCHAR";
+		}else if("bigint".equalsIgnoreCase(type)){
+			return "NUMBER";
+		}else if("longtext".equalsIgnoreCase(type)){
 			return "VARCHAR";
 		}
 		throw new Exception("需要增加类型！"+type);
@@ -331,7 +335,9 @@ public class  DBField implements Comparable<DBField> {
 		} else if("datetime".equalsIgnoreCase(type)){
 			return "timestamp";
 		} else if("text".equalsIgnoreCase(type)){
-			return "VARCHAR("+length+")";
+			return "text";
+		}else if("longtext".equalsIgnoreCase(type)){
+			return "longtext";
 		} 
 		throw new Exception("需要增加类型！"+type);
 	}
