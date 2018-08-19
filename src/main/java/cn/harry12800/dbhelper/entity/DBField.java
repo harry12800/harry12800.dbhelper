@@ -299,6 +299,8 @@ public class  DBField implements Comparable<DBField> {
 			return "NUMBER";
 		}else if("longtext".equalsIgnoreCase(type)){
 			return "VARCHAR";
+		}else if("longblob".equalsIgnoreCase(type)){
+			return "CLOB";
 		}
 		throw new Exception("需要增加类型！"+type);
 	}
@@ -338,6 +340,8 @@ public class  DBField implements Comparable<DBField> {
 			return "text";
 		}else if("longtext".equalsIgnoreCase(type)){
 			return "longtext";
+		}else if("longblob".equalsIgnoreCase(type)){
+			return "BLOB";
 		} 
 		throw new Exception("需要增加类型！"+type);
 	}
