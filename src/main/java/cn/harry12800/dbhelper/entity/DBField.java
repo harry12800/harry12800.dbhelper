@@ -390,6 +390,9 @@ public class  DBField implements Comparable<DBField> {
 		}
 		if(propName.equals("MASTERKEY")){
 			isPrimaryKey = (""+object).equals("1")? true:false;
+			if(!isPrimaryKey){
+				isPrimaryKey = (""+object).equals("YES")? true:false;
+			}
 		}
 		if(propName.equals("COMMENTS")){
 			if(object!=null&&!"".equals(object))
