@@ -1,11 +1,14 @@
 package cn.harry12800.dbhelper.entity;
 
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cn.harry12800.dbhelper.DBType;
+import cn.harry12800.dbhelper.Db;
+import cn.harry12800.dbhelper.PGSqlHelper;
 import cn.harry12800.tools.StringUtils;
 import cn.harry12800.tree2word.memorydata.Record;
 
@@ -23,7 +26,22 @@ public class  DBField implements Comparable<DBField> {
 	public DBField() {
 		// TODO Auto-generated constructor stub
 	}
-	
+	public static void main(String[] args) {
+		Db db = new  PGSqlHelper();
+		try {
+			List<?> query = PGSqlHelper.query("select * from test");
+			int size = query.size();
+			System.out.println(size);
+			for (Object object : query) {
+				Object[] objs = (Object[]) object;
+				for (Object object2 : objs) {
+					System.out.println(object2.getClass());
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	/**
 	 * 获取name
 	 *	@return the name
@@ -301,6 +319,8 @@ public class  DBField implements Comparable<DBField> {
 			return "VARCHAR";
 		}else if("longblob".equalsIgnoreCase(type)){
 			return "CLOB";
+		}else if("timestamp".equalsIgnoreCase(type)){
+			return "TIMESTAMP";
 		}
 		throw new Exception("需要增加类型！"+type);
 	}
@@ -342,6 +362,8 @@ public class  DBField implements Comparable<DBField> {
 			return "longtext";
 		}else if("longblob".equalsIgnoreCase(type)){
 			return "BLOB";
+		} else if("timestamp".equalsIgnoreCase(type)){
+			return "TIMESTAMP";
 		} 
 		throw new Exception("需要增加类型！"+type);
 	}
