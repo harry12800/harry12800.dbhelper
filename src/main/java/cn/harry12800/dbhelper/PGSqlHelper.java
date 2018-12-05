@@ -46,9 +46,7 @@ public class PGSqlHelper implements Db{
 		}
 		return null;
 	}
-/*
- *mysql> desc information_schema.columns;
- * */
+ 
 	/**
 	 * 得到数据库表结构
 	 * @return
@@ -67,6 +65,7 @@ public class PGSqlHelper implements Db{
 				table.setComment( o[12].toString());
 			}
 			DBField field = new DBField();
+			System.err.println(o[2]);
 			field.addProp("COLUMNNAME", o[1]);
 			field.addProp("COLUMNTYPE", o[2]);
 			field.addProp("LENGTH", o[3]);

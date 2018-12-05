@@ -7,7 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cn.harry12800.dbhelper.DBType;
-import cn.harry12800.dbhelper.Db;
 import cn.harry12800.dbhelper.PGSqlHelper;
 import cn.harry12800.tools.StringUtils;
 import cn.harry12800.tree2word.memorydata.Record;
@@ -27,7 +26,6 @@ public class  DBField implements Comparable<DBField> {
 		// TODO Auto-generated constructor stub
 	}
 	public static void main(String[] args) {
-		Db db = new  PGSqlHelper();
 		try {
 			List<?> query = PGSqlHelper.query("select * from test");
 			int size = query.size();
@@ -281,6 +279,7 @@ public class  DBField implements Comparable<DBField> {
 		
 	}
 	private String getOracleType() throws Exception {
+		System.err.println(type);
 		if("number".equalsIgnoreCase(type)){
 		{
 			if(precision>0)

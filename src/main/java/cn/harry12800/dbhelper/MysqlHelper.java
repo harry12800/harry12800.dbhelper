@@ -1,7 +1,5 @@
 package cn.harry12800.dbhelper;
 
- 
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -26,7 +24,7 @@ import cn.harry12800.tree2word.memorydata.Table;
  * @author harry12800
  *
  */
-public class MysqlHelper implements Db{
+public class MysqlHelper implements Db {
 	Table dbTable = new Table("db");
 	Table oneTable = new Table("oneTable");
 	/* 三个table的主外键关系，及逻辑条件的守护者 */
@@ -34,7 +32,7 @@ public class MysqlHelper implements Db{
 	public static String url = "jdbc:mysql://127.0.0.1:3306/nytm";
 	public static String user = "root";
 	public static String password = "admin";
-	
+
 	// 连接数据库的方法
 	public static Connection getConnection() {
 		try {
@@ -46,14 +44,16 @@ public class MysqlHelper implements Db{
 		}
 		return null;
 	}
-/*
- *mysql> desc information_schema.columns;
- * */
+
+	/*
+	 * mysql> desc information_schema.columns;
+	 */
 	/**
 	 * 得到数据库表结构
+	 * 
 	 * @return
 	 */
-	public static  List<DBTable> getDBTableSturctureMap() throws Exception {
+	public static List<DBTable> getDBTableSturctureMap() throws Exception {
 		String sql = FileUtils.getSqlStringByFileName("mysqlDbDescSql.sql");
 		System.out.println(sql);
 		List<?> lst = query(sql);
@@ -64,11 +64,18 @@ public class MysqlHelper implements Db{
 				DBTable table = new DBTable();
 				map.put(o[0].toString(), table);
 				table.setName(o[0].toString());
-				table.setComment( o[12].toString());
+				table.setComment(o[12].toString());
 			}
 			DBField field = new DBField();
+//			System.err.println(o[2].getClass());
+//			System.err.println(o[1].getClass());
+//			System.err.println(new String((byte[]) o[2]));
 			field.addProp("COLUMNNAME", o[1]);
-			field.addProp("COLUMNTYPE", o[2]);
+			if (o[2].getClass().isArray()) {
+				field.addProp("COLUMNTYPE", new String((byte[]) o[2]));
+			} else {
+				field.addProp("COLUMNTYPE",o[2]);
+			}
 			field.addProp("LENGTH", o[3]);
 			field.addProp("PRECISION", o[4]);
 			field.addProp("NOTNULL", o[5]);
@@ -81,71 +88,76 @@ public class MysqlHelper implements Db{
 			field.addProp("TBDESC", o[12]);
 			map.get(o[0]).addField(field);
 		}
-//		sql = FileUtils.getSqlStringByFileName("ForeginKey.sql");
-//		System.out.println(sql);
-//		lst = query(sql);
-//		for (Object object : lst) {
-//			Object[] o = (Object[]) object;
-//			String FieldName=o[1].toString();
-//			DBTable table = map.get(o[2].toString());
-//			String fyFieldName = o[3].toString();
-//			String deleteRule = o[4].toString();
-//			map.get(o[0].toString()).addForeginKey(FieldName,table,fyFieldName,deleteRule);
-//		}
-		 List<DBTable> list = new ArrayList<DBTable>();
-		 list.addAll(map.values()  );
-		return  list;
+		// sql = FileUtils.getSqlStringByFileName("ForeginKey.sql");
+		// System.out.println(sql);
+		// lst = query(sql);
+		// for (Object object : lst) {
+		// Object[] o = (Object[]) object;
+		// String FieldName=o[1].toString();
+		// DBTable table = map.get(o[2].toString());
+		// String fyFieldName = o[3].toString();
+		// String deleteRule = o[4].toString();
+		// map.get(o[0].toString()).addForeginKey(FieldName,table,fyFieldName,deleteRule);
+		// }
+		List<DBTable> list = new ArrayList<DBTable>();
+		list.addAll(map.values());
+		return list;
 	}
+
 	/**
 	 * 获取数据库的word描述文件
+	 * 
 	 * @throws Exception
 	 */
 	public void init() throws Exception {
 		realData(MysqlHelper.getDBTableSturctureMap());
 		addRelationShip();
-		oneTable.setAdapter(new  DBAdapter());
+		oneTable.setAdapter(new DBAdapter());
 		dbTable.start("id", "1", guard);
 	}
+
 	/**
 	 * 获取数据库的word描述文件
+	 * 
 	 * @throws Exception
 	 */
 	public void init(String path) throws Exception {
 		realData(MysqlHelper.getDBTableSturctureMap());
 		addRelationShip();
-		oneTable.setAdapter(new  DBAdapter());
+		oneTable.setAdapter(new DBAdapter());
 		dbTable.applyFileName(path, MysqlHelper.user, "id", "1", guard);
 	}
 
 	/**
 	 * 从查询语句到查询结果List
+	 * 
 	 * @param sql
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static List<?> query(String sql) throws Exception {
-		 // 同样先要获取连接，即连接到数据库public   Connection conn;
+		// 同样先要获取连接，即连接到数据库public Connection conn;
 		try (Connection conn = getConnection();
-			Statement	st = (Statement) conn.createStatement();
-			ResultSet rs = st.executeQuery(sql);){
-			 // 创建用于执行静态sql语句的Statement对象，st属局部变量
-			 // 执行sql查询语句，返回查询数据的结果集
+				Statement st = (Statement) conn.createStatement();
+				ResultSet rs = st.executeQuery(sql);) {
+			// 创建用于执行静态sql语句的Statement对象，st属局部变量
+			// 执行sql查询语句，返回查询数据的结果集
 			return resultSetToList(rs);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.out.println("查询数据失败");
 			throw new Exception("数据库操作失败！");
-		} 
+		}
 	}
 
 	/**
 	 * 将rs结果集转换成List
+	 * 
 	 * @param rs
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
-	public static List<?> resultSetToList(ResultSet rs)
-			throws java.sql.SQLException {
+	public static List<?> resultSetToList(ResultSet rs) throws java.sql.SQLException {
 		if (rs == null)
 			return Collections.EMPTY_LIST;
 		ResultSetMetaData md = rs.getMetaData(); // 得到结果集(rs)的结构信息，比如字段数、字段名等
@@ -169,7 +181,7 @@ public class MysqlHelper implements Db{
 		r.put("id", "1");
 		r.put("name", "数据库数据字典");
 		dbTable.put(r);
-		for (  DBTable table : list) {
+		for (DBTable table : list) {
 			Record r1 = new Record();
 			readNode(r1, table);
 			r1.put("name", table.getName());
@@ -180,11 +192,11 @@ public class MysqlHelper implements Db{
 	/**
 	 * 
 	 * @param r1
-	 * @param table 
+	 * @param table
 	 * @param value
 	 * @param title
 	 */
-	private void readNode(Record r1, DBTable table ) {
+	private void readNode(Record r1, DBTable table) {
 		TableDataMeta tableDataMeta = new TableDataMeta();
 		ArrayList<List<String>> contents = new ArrayList<List<String>>();
 		ArrayList<String> heads = new ArrayList<String>();
@@ -226,29 +238,31 @@ public class MysqlHelper implements Db{
 		guard.addFatherSon(dbTable, "id", oneTable, "parentId");
 		guard.printFatherSon();
 	}
+
 	@Override
-	public  void generateDescFile(String url, String user, String pwd) throws Exception {
-	
-		if(url!=null)	MysqlHelper.url= url;
-		if(user !=null ) MysqlHelper.user= user;
-		if(pwd!=null) MysqlHelper.password= pwd;
+	public void generateDescFile(String url, String user, String pwd) throws Exception {
+
+		if (url != null)
+			MysqlHelper.url = url;
+		if (user != null)
+			MysqlHelper.user = user;
+		if (pwd != null)
+			MysqlHelper.password = pwd;
 		new MysqlHelper().init();
 	}
 
 	public static void main(String[] args) throws Exception {
-		new MysqlHelper().generateDescFile(null,null,null);
+		new MysqlHelper().generateDescFile(null, null, null);
 	}
+
 	@Override
-	public Map<String, List<String>> getTableAndColumns(String url,
-			String user, String pwd) throws Exception {
+	public Map<String, List<String>> getTableAndColumns(String url, String user, String pwd) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-
 	@Override
-	public Map<String, String> getTableComments(String url, String user,
-			String pwd) throws Exception {
+	public Map<String, String> getTableComments(String url, String user, String pwd) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -258,23 +272,24 @@ public class MysqlHelper implements Db{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	@Override
-	public String getCommentDDL(String url, String user, String pwd)
-			throws Exception {
+	public String getCommentDDL(String url, String user, String pwd) throws Exception {
 		return null;
 	}
+
 	@Override
-	public List<DBTable> getTableDetail(String url, String user,
-			String pwd) throws Exception {
+	public List<DBTable> getTableDetail(String url, String user, String pwd) throws Exception {
 		MysqlHelper.url = url;
 		MysqlHelper.user = user;
 		MysqlHelper.password = pwd;
 		return getDBTableSturctureMap();
 	}
+
 	@Override
 	public boolean testConnection() {
 		Connection connection = getConnection();
-		if(connection==null)
+		if (connection == null)
 			return false;
 		return true;
 	}
@@ -282,10 +297,11 @@ public class MysqlHelper implements Db{
 	@Override
 	public boolean testConnection(String url, String user, String pwd) {
 		Connection connection = getConnection(url, user, pwd);
-		if(connection==null)
+		if (connection == null)
 			return false;
 		return true;
 	}
+
 	private static Connection getConnection(String url, String user, String pwd) {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
@@ -296,41 +312,48 @@ public class MysqlHelper implements Db{
 		}
 		return null;
 	}
-	@Override
-	public void generateDescFile(String url, String user, String pwd,
-			String path) throws Exception {
 
-		if(url!=null)	MysqlHelper.url= url;
-		if(user !=null ) MysqlHelper.user= user;
-		if(pwd!=null) MysqlHelper.password= pwd;
+	@Override
+	public void generateDescFile(String url, String user, String pwd, String path) throws Exception {
+
+		if (url != null)
+			MysqlHelper.url = url;
+		if (user != null)
+			MysqlHelper.user = user;
+		if (pwd != null)
+			MysqlHelper.password = pwd;
 		new MysqlHelper().init(path);
 	}
+
 	@Override
 	public void exeSql(String sql) throws Exception {
 		// 同样先要获取连接，即连接到数据库public Connection conn;
 		try (Connection conn = getConnection();
-//				PreparedStatement st = conn.prepareStatement(sql);
-				Statement st = (Statement) conn.createStatement();
-				) {
+				// PreparedStatement st = conn.prepareStatement(sql);
+				Statement st = (Statement) conn.createStatement();) {
 			String[] split = sql.split(";");
 			for (String string : split) {
 				st.addBatch(string);
 			}
 			st.executeBatch();
-			//st.executeUpdate(sql);
-//			st.execute(sql); 
+			// st.executeUpdate(sql);
+			// st.execute(sql);
 			// 创建用于执行静态sql语句的Statement对象，st属局部变量
 			// 执行sql查询语句，返回查询数据的结果集
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new Exception("数据库操作失败！"+e.getMessage());
+			throw new Exception("数据库操作失败！" + e.getMessage());
 		}
 	}
+
 	@Override
-	public void exeSql(String url, String user, String pwd, String sql) throws Exception{
-		if(url!=null)	MysqlHelper.url= url;
-		if(user !=null ) MysqlHelper.user= user;
-		if(pwd!=null) MysqlHelper.password= pwd;
+	public void exeSql(String url, String user, String pwd, String sql) throws Exception {
+		if (url != null)
+			MysqlHelper.url = url;
+		if (user != null)
+			MysqlHelper.user = user;
+		if (pwd != null)
+			MysqlHelper.password = pwd;
 		exeSql(sql);
 	}
 }
